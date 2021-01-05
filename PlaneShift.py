@@ -33,11 +33,7 @@ class PlaneShift(object):
             self.hidden_service_dir = hidden_service_dir
             self.hidden_service_name = hidden_service_name
             self.keep_hidden_service = keep_hidden_service
-
-
-            #toric.deconstruct_torprocess()
-            #toric.deconstruct_controller()
-
+            self.version = "PlaneShift Router v0.2"
         except Exception as ex:
             if self.verbose == True:
                 print("Error in PlaneShift Pre Setup : ", ex)
