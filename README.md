@@ -10,7 +10,7 @@ Things you will need :
 
 * linux based system
 
-* the requirements from `requirements.txt` ( **You can install those by executing `sudo pip3 install -r requirements.txt`)
+* the requirements from `requirements.txt` ( **You can install those by executing** `sudo pip3 install -r requirements.txt`)
 
 # Wiki :
 
