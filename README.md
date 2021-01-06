@@ -1,4 +1,4 @@
-# PlaneShift :
+![PlaneShift](https://github.com/Blessed-NullArray/PlaneShift/blob/master/imgs/planeshift-banner1.png?raw=true)
 
 **PlaneShift** is a script using [TORic](https://github.com/Blessed-NullArray/TORic) to make **Hidden Services** by routing a website that is running on localhost over tor.
 
