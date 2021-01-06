@@ -16,6 +16,6 @@ Things you will need :
 
 https://github.com/Blessed-NullArray/PlaneShift/wiki
 
-# Example Usage of PlaneShift :
+# Usage of PlaneShift :
 
 ![PlaneShift-Carbon](https://github.com/Blessed-NullArray/PlaneShift/blob/master/imgs/planeshift-carbon.png?raw=true)
