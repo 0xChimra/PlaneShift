@@ -1,4 +1,5 @@
 from toolbox import TORic
+from toolbox import color
 import sys
 import os
 import shutil
@@ -8,16 +9,22 @@ from threading import Thread
 import time
 
 class PlaneShift(object):
-    def __init__(self, socks_port="", host="127.0.0.1", port="", verbose=True, hidden_service_dir="/tmp", hidden_service_name="PlaneShift", keep_hidden_service=False):
+    def __init__(self, text_color=True, socks_port="", host="127.0.0.1", port="", verbose=True, hidden_service_dir="/tmp", hidden_service_name="PlaneShift", keep_hidden_service=False):
         try:
             if port == "":
                 if verbose == True:
-                    print("No localhost port for PlaneShift selected")
+                    if text_color == True:
+                        print(color.ERROR + "No localhost port for PlaneShift selected")
+                    else:
+                        print("No localhost port for PlaneShift selected")
                 sys.exit(1)
 
             if socks_port == "":
                 if verbose == True:
-                    print("No socks port for PlaneShift selected")
+                    if text_color == True:
+                        print(color.ERROR + "No socks port for PlaneShift selected")
+                    else:
+                        print("No socks port for PlaneShift selected")
                 sys.exit(1)
 
             #TORic
@@ -26,6 +33,7 @@ class PlaneShift(object):
             toric.constuct_controller()
             self.toric = toric
             #Variables
+            self.text_color = text_color
             self.verbose = verbose
             self.local_port = int(port)
             self.host = str(host)
@@ -33,7 +41,8 @@ class PlaneShift(object):
             self.hidden_service_dir = hidden_service_dir
             self.hidden_service_name = hidden_service_name
             self.keep_hidden_service = keep_hidden_service
-            self.version = "PlaneShift Router v0.3"
+            self.version = "PlaneShift Router v0.4"
+            
         except Exception as ex:
             if self.verbose == True:
                 print("Error in PlaneShift Pre Setup : ", ex)
@@ -59,7 +68,10 @@ class PlaneShift(object):
                         pass
                     else:
                         if self.verbose == True:
-                            print("Alive Check recorded the target server dead!")
+                            if self.text_color == True:
+                                print(color.ERROR + "Alive Check recorded the target server dead!")
+                            else:
+                                print("Alive Check recorded the target server dead!")
                         sock.close()
                         self.toric.deconstruct_torprocess()
                         self.toric.deconstruct_controller()
@@ -81,12 +93,18 @@ class PlaneShift(object):
             self.onion_address = self.hidden_service.hostname
 
             if printer == True:
-                print("Hidden Service Address : ", self.onion_address)
+                if self.text_color == True:
+                    print("Hidden Service Address : "+ color.MAGENTA, self.onion_address + color.GREEN + ".onion")
+                else:
+                    print("Hidden Service Address : ", self.onion_address + ".onion")
             if alive_check == "auto":
                 x = Thread(target=alive_checker, args=(self.host, self.local_port, alive_check_timer))
                 x.start()
             elif alive_check == "manual":
-                print("Press Enter if you want to shutdown the hidden service : ", end="")
+                if self.text_color == True:
+                    print("Press Enter if you want to shutdown the " + color.GREEN + "hidden service" + color.WHITE + " : ", end="")
+                else:
+                    print("Press Enter if you want to shutdown the hidden service : ", end="")
                 input("")
 
                 self.toric.deconstruct_torprocess()
@@ -94,10 +112,27 @@ class PlaneShift(object):
                 if not self.keep_hidden_service == True:
                     shutil.rmtree(self.hsd)
                     self.toric.controller.remove_hidden_service(self.hsd)
+            else:
+                if self.verbose == True:
+                    if self.text_color == True:
+                        print(color.ERROR + "Unknown Alive Check Parameter found")
+                    else:
+                        print("Unknown Alive Check Parameter found")
+                
+                self.toric.deconstruct_torprocess()
+                self.toric.deconstruct_controller()
+                if not self.keep_hidden_service == True:
+                    shutil.rmtree(self.hsd)
+                    self.toric.controller.remove_hidden_service(self.hsd)
+                sys.exit(1)
+                
 
         except Exception as ex:
             if self.verbose == True:
-                print("Error in PlaneShift's default Hidden Service Creator : ", ex)
+                if self.text_color == True:
+                    print(color.ERROR + "Error in PlaneShift's default Hidden Service Creator : " + color.RED, ex, color.WHITE)
+                else:
+                    print("Error in PlaneShift's default Hidden Service Creator : ", ex)
             try:
                 if not self.keep_hidden_service == True:
                     shutil.rmtree(self.hsd)
@@ -122,7 +157,11 @@ class PlaneShift(object):
                         pass
                     else:
                         if self.verbose == True:
-                            print("Alive Check recorded the target server dead!")
+                            if self.text_color == True:
+                                if self.text_color == True:
+                                    print(color.ERROR + "Alive Check recorded the target server dead!")
+                                else:
+                                    print("Alive Check recorded the target server dead!")
                         sock.close()
                         self.toric.deconstruct_torprocess()
                         self.toric.deconstruct_controller()
@@ -158,13 +197,19 @@ class PlaneShift(object):
             self.onion_address = self.hidden_service.service_id
 
             if printer == True:
-                print("Hidden Service Address : ", self.onion_address)
+                if self.text_color == True:
+                    print("Hidden Service Address : "+ color.MAGENTA, self.onion_address + color.GREEN + ".onion")
+                else:
+                    print("Hidden Service Address : ", self.onion_address + ".onion")
 
             if alive_check == "auto":
                 x = Thread(target=alive_checker, args=(self.host, self.local_port, alive_check_timer, key_path))
                 x.start()
             elif alive_check == "manual":
-                print("Press Enter if you want to shutdown the hidden service : ", end="")
+                if self.text_color == True:
+                    print("Press Enter if you want to shutdown the " + color.GREEN + "hidden service" + color.WHITE + " : ", end="")
+                else:
+                    print("Press Enter if you want to shutdown the hidden service : ", end="")
                 input("")
 
                 self.toric.deconstruct_torprocess()
@@ -172,9 +217,26 @@ class PlaneShift(object):
                 if not self.keep_hidden_service == True:
                     os.remove(key_path)
                     self.toric.controller.remove_ephemeral_hidden_service(self.onion_address)
+            else:
+                if self.verbose == True:
+                    if self.text_color == True:
+                        print(color.ERROR + "Unknown Alive Check Parameter found")
+                    else:
+                        print("Unknown Alive Check Parameter found")
+
+                if not self.keep_hidden_service == True:
+                    os.remove(key_path)
+                    self.toric.controller.remove_hidden_service(self.hsd)
+                self.toric.deconstruct_torprocess()
+                self.toric.deconstruct_controller()
+                sys.exit(1)
+                
         except Exception as ex:
             if self.verbose == True:
-                print("Error in PlaneShift's ephemeral Hidden Service Creator : ", ex)
+                if self.text_color == True:
+                    print(color.ERROR + "Error in PlaneShift's ephemeral Hidden Service Creator : ", ex)
+                else:
+                    print("Error in PlaneShift's ephemeral Hidden Service Creator : ", ex)
             try:
                 if not self.keep_hidden_service == True:
                     os.remove(key_path)
@@ -184,3 +246,6 @@ class PlaneShift(object):
             except:
                 pass
             sys.exit(1)
+
+planeshift = PlaneShift(socks_port=20000, port=200)
+planeshift.run_default_hidden_service(printer=True)
