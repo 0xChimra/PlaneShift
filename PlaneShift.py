@@ -246,6 +246,3 @@ class PlaneShift(object):
             except:
                 pass
             sys.exit(1)
-
-planeshift = PlaneShift(socks_port=20000, port=200)
-planeshift.run_default_hidden_service(printer=True)
