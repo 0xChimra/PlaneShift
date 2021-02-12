@@ -9,15 +9,36 @@ import string
 import subprocess
 import time
 import requests
+from threading import Thread
 
 class TORic(object):
-    def __init__(self, socks_port="", control_port="", verbose=True, password=""):
+    def __init__(self, socks_port="", control_port="", verbose=True, password="", allow_admin=False, tor_path=None):
         try:
 
-            if int(os.getuid()) == 0:
-                if verbose == True:
-                    print("Do Not Launch a Tor Handler as a superuser or root")
-                sys.exit(1)
+            if sys.platform == "linux" or sys.platform == "linux2":
+                self.os_type = "linux"
+            elif sys.platform == "win32":
+                self.os_type = "windows"
+
+
+            if allow_admin == False:
+                if not self.os_type == "windows":
+                    if int(os.getuid()) == 0:
+                        if verbose == True:
+                            print("Do Not Launch a Tor Handler as a superuser or root")
+                        sys.exit(1)
+
+            
+
+            if self.os_type == "windows":
+                if tor_path == None:
+                    if verbose == True:
+                        print("Defaulting to TORic Windows binary")
+                    work_dir = os.getcwd()
+                    tor_binary = work_dir + "\\WindowsTor\\Tor\\tor.exe"
+                    self.tor_path = str(tor_binary)
+                else:
+                    self.tor_path = str(tor_path)
 
             if socks_port == "":
                 if verbose == True:
@@ -50,7 +71,7 @@ class TORic(object):
                 print("Error in TORic Configuration : ", ex)
             sys.exit(1)
 
-        self.version = "TORic Construct v0.4"
+        self.version = "TORic Construct v0.6"
         self.verbose = verbose
         self.socks_port = int(socks_port)
         self.control_port = int(control_port)      
@@ -69,9 +90,15 @@ class TORic(object):
         return str(allocated_pass)
 
     def hash_passwd(self):
-        x = subprocess.check_output(['tor', '--hash-password', self.password])
-        y = str(x.decode("utf-8"))
-        return y
+        if self.os_type == "linux":
+            x = subprocess.check_output(['tor', "--quiet", '--hash-password', self.password])
+            y = str(x.decode("utf-8"))
+            return y
+        elif self.os_type == "windows":
+            x = subprocess.check_output([self.tor_path, "--quiet", '--hash-password', self.password])
+            y = str(x.decode("utf-8"))
+            return y
+
 
     def constuct_controller(self):
         try:
@@ -133,17 +160,29 @@ class TORic(object):
                 else:
                     path_to_torrc = str("torrc")
 
-                if self.verbose == True:
-                    self.tor_process = stem.process.launch_tor(torrc_path=path_to_torrc, init_msg_handler = bootstrapped)
-                else:
-                    self.tor_process = stem.process.launch_tor(torrc_path=path_to_torrc)
+                if self.os_type == "linux":
+                    if self.verbose == True:
+                        self.tor_process = stem.process.launch_tor(torrc_path=path_to_torrc, init_msg_handler = bootstrapped)
+                    else:
+                        self.tor_process = stem.process.launch_tor(torrc_path=path_to_torrc)
+                elif self.os_type == "windows":
+                    if self.verbose == True:
+                        self.tor_process = stem.process.launch_tor(tor_cmd=self.tor_path, torrc_path=path_to_torrc, init_msg_handler = bootstrapped)
+                    else:
+                        self.tor_process = stem.process.launch_tor(tor_cmd=self.tor_path, torrc_path=path_to_torrc)
                     
             elif torrc == False:
                 torrc_config = {"SOCKSPort": str(self.socks_port), "ControlPort": str(self.control_port), "RunAsDaemon": daemon, "HashedControlPassword": self.hashed_password}
-                if self.verbose == True:
-                    self.tor_process = stem.process.launch_tor_with_config(config = torrc_config, init_msg_handler = bootstrapped)
-                else:
-                    self.tor_process = stem.process.launch_tor_with_config(config = torrc_config)
+                if self.os_type == "linux":
+                    if self.verbose == True:
+                        self.tor_process = stem.process.launch_tor_with_config(config = torrc_config, init_msg_handler = bootstrapped)
+                    else:
+                        self.tor_process = stem.process.launch_tor_with_config(config = torrc_config)
+                if self.os_type == "windows":
+                    if self.verbose == True:
+                        self.tor_process = stem.process.launch_tor_with_config(tor_cmd=self.tor_path, config = torrc_config, init_msg_handler = bootstrapped)
+                    else:
+                        self.tor_process = stem.process.launch_tor_with_config(tor_cmd=self.tor_path, config = torrc_config)
         except Exception as ex:
             if self.verbose == True:
                 print("Error in tor process construction : ", ex)
@@ -231,16 +270,33 @@ class TORic(object):
                 pass
             sys.exit(1)
     
-    def get_Bandwidth(self, printer=False):
+    def get_Bandwidth(self, printer=False, sentinel=False):
+        
+        def band_function(controller):
+            try:
+                bytes_read = self.controller.get_info("traffic/read")
+                bytes_written = self.controller.get_info("traffic/written")
+
+                if sentinel == True:
+                    if printer == True:
+                        print("Bandwidth Read : ", str(bytes_read) + " Bandwidth Written : ", str(bytes_written))
+                
+                self.bytes_read = bytes_read
+                self.bytes_written = bytes_written
+            except Exception as ex:
+                if self.verbose == True:
+                    print("BandWidth function error : ", ex)
+                try:
+                    self.tor_process.kill()
+                except:
+                    pass
         try:
-            bytes_read = self.controller.get_info("traffic/read")
-            bytes_written = self.controller.get_info("traffic/written")
 
-            if printer == True:
-                print("Bandwidth Read : ", str(bytes_read) + " Bandwidth Written : ", str(bytes_written))
-            
-
-            return bytes_read, bytes_written
+            if sentinel == True:
+                x = Thread(target=band_function, args=(self.controller))
+                x.start()
+            else:
+                band_function(self.controller)
 
         except Exception as ex:
             if self.verbose == True:
