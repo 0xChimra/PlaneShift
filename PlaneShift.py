@@ -41,7 +41,7 @@ class PlaneShift(object):
             self.hidden_service_dir = hidden_service_dir
             self.hidden_service_name = hidden_service_name
             self.keep_hidden_service = keep_hidden_service
-            self.version = "PlaneShift Router v0.5"
+            self.version = "PlaneShift Router v0.5.1"
             
         except Exception as ex:
             if self.verbose == True:
