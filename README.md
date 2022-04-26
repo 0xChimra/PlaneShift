@@ -1,6 +1,6 @@
-![PlaneShift](https://github.com/Blessed-NullArray/PlaneShift/blob/master/imgs/planeshift-banner1.png?raw=true)
+![PlaneShift](https://github.com/0xChimra/PlaneShift/blob/master/imgs/planeshift-banner1.png?raw=true)
 
-**PlaneShift** is a script using [TORic](https://github.com/Blessed-NullArray/TORic) to make **Hidden Services** by routing a website that is running on localhost over tor.
+**PlaneShift** is a script using [TORic](https://github.com/0xChimra/TORic) to make **Hidden Services** by routing a website that is running on localhost over tor.
 
 # Update :
 
@@ -26,4 +26,4 @@ https://github.com/Blessed-NullArray/PlaneShift/wiki
 
 # Usage of PlaneShift :
 
-![PlaneShift-Carbon](https://github.com/Blessed-NullArray/PlaneShift/blob/master/imgs/planeshift-carbon.png?raw=true)
+![PlaneShift-Carbon](https://github.com/0xChimra/PlaneShift/blob/master/imgs/planeshift-carbon.png?raw=true)
