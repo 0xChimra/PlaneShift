@@ -22,7 +22,7 @@ Things you will need :
 
 # Wiki :
 
-https://github.com/Blessed-NullArray/PlaneShift/wiki
+https://github.com/0xChimra/PlaneShift/wiki
 
 # Usage of PlaneShift :
 
